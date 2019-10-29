@@ -10,7 +10,7 @@ CONSUMER_SECRET = '9YcxuR1QoxS81FEEnY7FpA76G98j3q31fhl7MT0i55rFMGmV7W'
 t = Twython(CONSUMER_KEY, CONSUMER_SECRET,
    TOKEN, TOKEN_SECRET)
 
-data = t.search(q="Patriots", count=50)
+data = t.search(q="Piers Morgan", count=50)
 
 
 for status in data['statuses']:
