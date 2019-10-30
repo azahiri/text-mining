@@ -17,60 +17,14 @@ consumer_secret = '9YcxuR1QoxS81FEEnY7FpA76G98j3q31fhl7MT0i55rFMGmV7W'
 access_token = '1041370203563732992-pnt2lwFytx0JBfaC3Mgpr9XlZ60m7F' 
 acccess_token_secret = 'D2PqFSBeLzjHelCqMKHvipr5vHcWhkdCJH9S4CWGsQkwS'
 
-KEYWORDS = [
-    'Arsenal', 'Emery', 'Xhaka', 'Ozil'
-]
+KEYWORDS = ['Arsenal', 'Emery', 'Xhaka', 'Ozil']
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, acccess_token_secret)
 api = tweepy.API(auth)
-# for tweet in tweepy.Cursor(api.search,
-#                            q="arsenal OR xhaka OR emery OR football from:piersmorgan",
-#                            count=200,
-#                            result_type="recent",
-#                            include_entities=True,
-#                            lang="en").items():
-#                     print(tweet.created_at, tweet.text)
-
-# tweets = api.user_timeline(screen_name='piersmorgan', count=3200)
-# print(len(tweets))
-# for tweet in tweets:
-#     print(tweet.created_at, tweet.text)
-# tweets = api.user_timeline(screen_name="piersmorgan", count=200)
-# for tweet in tweets:
-#     if "Arsenal" in tweet.text:
-#         print(tweet.created_at, tweet.text)
 
 tweets = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
-# tweets1 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
-# tweets2 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
-# tweets3 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
-
 tweet_list = list(tweets.items())
-# print(len(list(tweets.items())))
-
-# def make_dict(tweets):
-#     dictionary = dict()
-#     for tweet in tweets.items():
-#         dictionary[tweet.created_at] = tweet.text
-#     return dictionary
-
-# def arsenal_tweets(tweets):
-#     count = 0
-#     for tweet in tweets.items():
-#         if "Arsenal" in tweet.text or "Emery" in tweet.text or "Xhaka" in tweet.text or "Ozil" in tweet.text:
-#             count += 1
-#             print(tweet.created_at, tweet.text)
-        # print(arsenal_tweets[-1:])
-# print(count)
-# arsenal_tweets(tweets)
-
-# def Convert(tup, di): 
-#     for a, b in tup: 
-#         di.setdefault(a, []).append(b) 
-#     return di 
-# tweet_dictionary = {}
-# print(Convert(arsenal_tweets(tweets), tweet_dictionary))
 
 def process_tweets(tweets, keywords):
     """
@@ -81,152 +35,152 @@ def process_tweets(tweets, keywords):
     for tweet in tweets:
         for keyword in keywords:
             if keyword in tweet.text:
-                useful_tweets.append(tweet.text)
+                useful_tweets.append(tweet)
                 break
     return useful_tweets
 
 useful_tweets = process_tweets(tweet_list, KEYWORDS)
 
-print(useful_tweets)
-print(len(useful_tweets))    
+# print(useful_tweets)
+# print(len(useful_tweets))    
 
 
 def show_count(tweets):
     count = 0
     for tweet in tweets:
-        if "Arsenal" in tweet.text or "Emery" in tweet.text or "Xhaka" in tweet.text or "Ozil" in tweet.text:
-            count += 1
+        count += 1
     return count
 
 def show_text(tweets):
     arsenal_tweet_text = []
     for tweet in tweets:
-        if ("Arsenal" in tweet.text or "Emery" in tweet.text or "Xhaka" in tweet.text or "Ozil" in tweet.text):
-            arsenal_tweet_text.append(tweet.text)
+        arsenal_tweet_text.append(tweet.text)
     return arsenal_tweet_text
 
 def show_len(tweets):
     arsenal_tweet_len = []
     for tweet in tweets:
-        if ("Arsenal" in tweet.text or "Emery" in tweet.text or "Xhaka" in tweet.text or "Ozil" in tweet.text):
-            arsenal_tweet_len.append(len(tweet.text))
+        arsenal_tweet_len.append(len(tweet.text))
     return arsenal_tweet_len
 
 def show_date(tweets):
     arsenal_tweet_date = []
     for tweet in tweets:
-        if ("Arsenal" in tweet.text or "Emery" in tweet.text or "Xhaka" in tweet.text or "Ozil" in tweet.text):
-            arsenal_tweet_date.append(tweet.created_at.strftime('%m/%d/%Y'))
+        arsenal_tweet_date.append(tweet.created_at.strftime('%m/%d/%Y'))
     return arsenal_tweet_date
 
-# print(show_count(tweets))
-# print(show_text(tweets1))
-# print(show_len(tweets2))
-# print(show_date(tweets3))
+def show_ID(tweets):
+    arsenal_tweet_text = []
+    for tweet in tweets:
+        arsenal_tweet_text.append(tweet.id)
+    return arsenal_tweet_text
+
+def show_source(tweets):
+    arsenal_tweet_text = []
+    for tweet in tweets:
+        arsenal_tweet_text.append(tweet.source)
+    return arsenal_tweet_text
+
+def show_likes(tweets):
+    arsenal_tweet_text = []
+    for tweet in tweets:
+        arsenal_tweet_text.append(tweet.favorite_count)
+    return arsenal_tweet_text
+
+def show_RT(tweets):
+    arsenal_tweet_text = []
+    for tweet in tweets:
+        arsenal_tweet_text.append(tweet.retweet_count)
+    return arsenal_tweet_text
+
+# print(show_count(useful_tweets))
+# print(show_text(useful_tweets))
+# print(show_len(useful_tweets))
+# print(show_date(useful_tweets))
+
+useful_tweets_text = show_text(useful_tweets)
+useful_tweets_len = show_len(useful_tweets)
+useful_tweets_date = show_date(useful_tweets)
+useful_tweets_ID = show_ID(useful_tweets)
+useful_tweets_source = show_source(useful_tweets)
+useful_tweets_likes = show_likes(useful_tweets)
+useful_tweets_RT = show_RT(useful_tweets)
 
 # # We create a pandas dataframe as follows:
-# data = pd.DataFrame(data=show_text(tweet_list), columns=['Tweets'])
-
-# # # We display the first 10 elements of the dataframe:
-# # display(data.head(10))
+data = pd.DataFrame(data=useful_tweets_text, columns=['Tweets'])
 
 # # We add relevant data:
-# data['len']  = np.array(show_len(tweet_list))
-# # data['ID']   = np.array([tweet.id for tweet in tweets])
-# data['Date'] = np.array(show_date(tweet_list))
-# # data['Source'] = np.array([tweet.source for tweet in tweets])
-# # data['Likes']  = np.array([tweet.favorite_count for tweet in tweets])
-# # data['RTs']    = np.array([tweet.retweet_count for tweet in tweets])
+data['len']  = np.array(useful_tweets_len)
+data['ID']   = np.array(useful_tweets_ID)
+data['Date'] = np.array(useful_tweets_date)
+data['Source'] = np.array(useful_tweets_source)
+data['Likes']  = np.array(useful_tweets_likes)
+data['RTs']    = np.array(useful_tweets_RT)
 
 # # Display of first 10 elements from dataframe:
-# display(data.head(10))
+display(data.head(10))
 
 # # We extract the mean of lenghts:
-# mean = np.mean(data['len'])
+mean = np.mean(data['len'])
 
-# print("The lenght's average in tweets: {}".format(mean))
+print("The lenght's average in tweets: {}".format(int(mean)))
 
-# print(arsenal_tweet_date)
+# We extract the tweet with more FAVs and more RTs:
 
-# joined = arsenal_tweet_text + arsenal_tweet_date
-# print(joined)
-# We create a pandas dataframe as follows:
-# data = pd.DataFrame(data=arsenal_tweet_date, columns=['Tweets'])
+fav_max = np.max(data['Likes'])
+rt_max  = np.max(data['RTs'])
 
-# # # We display the first 10 elements of the dataframe:
-# display(data.head(10))
+fav = data[data.Likes == fav_max].index[0]
+rt  = data[data.RTs == rt_max].index[0]
 
-# # We add relevant data:
-# # data['len']  = np.array(arsenal_tweet_len)
-# # data['ID']   = np.array([tweet.id for tweet in tweets])
-# data['Date'] = np.array(arsenal_tweet_date)
-# data['Source'] = np.array([tweet.source for tweet in tweets])
-# data['Likes']  = np.array([tweet.favorite_count for tweet in tweets])
-# data['RTs']    = np.array([tweet.retweet_count for tweet in tweets])
+# Max FAVs:
+print("The tweet with the most likes is: \n{}".format(data['Tweets'][fav]))
+print("Number of likes: {}".format(fav_max))
+print("{} characters.\n".format(data['len'][fav]))
 
-# Display of first 10 elements from dataframe:
-# display(data.head(10))
+# Max RTs:
+print("The tweet with the most retweets is: \n{}".format(data['Tweets'][rt]))
+print("Number of retweets: {}".format(rt_max))
+print("{} characters.\n".format(data['len'][rt]))
 
-# We extract the mean of lenghts:
-# mean = np.mean(data['len'])
+# We create time series for data:
 
-# print("The lenght's average in tweets: {}".format(mean))
+tlen = pd.Series(data=data['len'].values, index=data['Date'])
+tfav = pd.Series(data=data['Likes'].values, index=data['Date'])
+tret = pd.Series(data=data['RTs'].values, index=data['Date'])
 
-# # We print sources list:
-# print("Creation of content sources:")
-# for source in sources:
-#     print("* {}".format(source))
+# Lenghts along time:
+tlen.plot(figsize=(16,4), color='r')
+plt.show()
 
-# def create_dictionary(tweets):
-#     """
-#     Create a dictionary that includes only the necessary items from the twitter database.
-#     We only need the unique ID and the actual tweets.
-    
-#     """
-#     tweet_dictionary={}
-#     for tweet in tweets.items():
-#         # print(dir(tweet))
-#         # print(tweet.text, tweet.id)
-#         # print(dir(tweet.user))
-#         # print(tweet.user.screen_name)
-#         key = tweet.created_at
-#         if key not in tweet_dictionary:
-#             tweet_dictionary[key] = [tweet.text]
-#         else: 
-#             tweet_dictionary[key].append(tweet.text)
-#     return tweet_dictionary
+# Likes vs retweets visualization:
+tfav.plot(figsize=(16,4), label="Likes", legend=True)
+tret.plot(figsize=(16,4), label="Retweets", legend=True)
+plt.show()
 
-# print(create_dictionary(tweets.items()))
+# We obtain all possible sources:
+sources = []
+for source in data['Source']:
+    if source not in sources:
+        sources.append(source)
 
-# dictionary_tweets = create_dictionary(tweets)
+# We print sources list:
+print("Creation of content sources:")
+for source in sources:
+    print("* {}".format(source))
 
+# We create a numpy vector mapped to labels:
+percent = np.zeros(len(sources))
 
+for source in data['Source']:
+    for index in range(len(sources)):
+        if source == sources[index]:
+            percent[index] += 1
+            pass
 
-# tweets = api.user_timeline('realDonaldTrump')
-# print(dir(tweets[0]))
-# print(tweets[0].text)
-# print(tweets[0].id, tweets[0].text, tweets[0].created_at)
+percent /= 100
 
-# to print tweets
-# CLEANS LIST OF DICTIONARY
-# def clean_tweets(dictionary_tweets):
-#     """
-#     function that cleans the tweets 
-#     this function removes the user id, url, and the 'RT' sign from 
-#     the values of the dictionary tweets 
-#     """
-#     for key, value in dictionary_tweets.items():
-#         count = 0
-#         for word in value:
-#             # print(words)
-#             # print(type(words))
-#             word = re.sub('@[^\s]+','',word) #gets rid of id 
-#             word = remove_url(word) #gets rid of url
-#             word = word.strip('RT') #get rid of rt
-#             dictionary_tweets[key][count] = word
-#             count += 1
-#     # print(dictionary_tweets)
-#     return dictionary_tweets
-
-# cleaned_tweets = clean_tweets(dictionary_tweets)
-# # print(cleaned_tweets)
+# Pie chart:
+pie_chart = pd.Series(percent, index=sources, name='Sources')
+pie_chart.plot.pie(fontsize=11, autopct='%.2f', figsize=(6, 6))
+plt.show()
