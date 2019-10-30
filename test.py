@@ -17,6 +17,10 @@ consumer_secret = '9YcxuR1QoxS81FEEnY7FpA76G98j3q31fhl7MT0i55rFMGmV7W'
 access_token = '1041370203563732992-pnt2lwFytx0JBfaC3Mgpr9XlZ60m7F' 
 acccess_token_secret = 'D2PqFSBeLzjHelCqMKHvipr5vHcWhkdCJH9S4CWGsQkwS'
 
+KEYWORDS = [
+    'Arsenal', 'Emery', 'Xhaka', 'Ozil'
+]
+
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, acccess_token_secret)
 api = tweepy.API(auth)
@@ -38,9 +42,11 @@ api = tweepy.API(auth)
 #         print(tweet.created_at, tweet.text)
 
 tweets = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
-tweets1 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
-tweets2 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
-tweets3 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
+# tweets1 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
+# tweets2 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
+# tweets3 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
+
+tweet_list = list(tweets.items())
 # print(len(list(tweets.items())))
 
 # def make_dict(tweets):
@@ -66,30 +72,49 @@ tweets3 = tweepy.Cursor(api.user_timeline, screen_name='piersmorgan')
 # tweet_dictionary = {}
 # print(Convert(arsenal_tweets(tweets), tweet_dictionary))
 
+def process_tweets(tweets, keywords):
+    """
+    Given a list of tweets, a list of keywords,
+    return a list of tweets that only contain the keywords
+    """
+    useful_tweets = []
+    for tweet in tweets:
+        for keyword in keywords:
+            if keyword in tweet.text:
+                useful_tweets.append(tweet.text)
+                break
+    return useful_tweets
+
+useful_tweets = process_tweets(tweet_list, KEYWORDS)
+
+print(useful_tweets)
+print(len(useful_tweets))    
+
+
 def show_count(tweets):
     count = 0
-    for tweet in tweets.items():
+    for tweet in tweets:
         if "Arsenal" in tweet.text or "Emery" in tweet.text or "Xhaka" in tweet.text or "Ozil" in tweet.text:
             count += 1
     return count
 
 def show_text(tweets):
     arsenal_tweet_text = []
-    for tweet in tweets.items():
+    for tweet in tweets:
         if ("Arsenal" in tweet.text or "Emery" in tweet.text or "Xhaka" in tweet.text or "Ozil" in tweet.text):
             arsenal_tweet_text.append(tweet.text)
     return arsenal_tweet_text
 
 def show_len(tweets):
     arsenal_tweet_len = []
-    for tweet in tweets.items():
+    for tweet in tweets:
         if ("Arsenal" in tweet.text or "Emery" in tweet.text or "Xhaka" in tweet.text or "Ozil" in tweet.text):
             arsenal_tweet_len.append(len(tweet.text))
     return arsenal_tweet_len
 
 def show_date(tweets):
     arsenal_tweet_date = []
-    for tweet in tweets.items():
+    for tweet in tweets:
         if ("Arsenal" in tweet.text or "Emery" in tweet.text or "Xhaka" in tweet.text or "Ozil" in tweet.text):
             arsenal_tweet_date.append(tweet.created_at.strftime('%m/%d/%Y'))
     return arsenal_tweet_date
@@ -99,27 +124,27 @@ def show_date(tweets):
 # print(show_len(tweets2))
 # print(show_date(tweets3))
 
-# We create a pandas dataframe as follows:
-data = pd.DataFrame(data=show_text(tweets1), columns=['Tweets'])
+# # We create a pandas dataframe as follows:
+# data = pd.DataFrame(data=show_text(tweet_list), columns=['Tweets'])
 
-# # We display the first 10 elements of the dataframe:
+# # # We display the first 10 elements of the dataframe:
+# # display(data.head(10))
+
+# # We add relevant data:
+# data['len']  = np.array(show_len(tweet_list))
+# # data['ID']   = np.array([tweet.id for tweet in tweets])
+# data['Date'] = np.array(show_date(tweet_list))
+# # data['Source'] = np.array([tweet.source for tweet in tweets])
+# # data['Likes']  = np.array([tweet.favorite_count for tweet in tweets])
+# # data['RTs']    = np.array([tweet.retweet_count for tweet in tweets])
+
+# # Display of first 10 elements from dataframe:
 # display(data.head(10))
 
-# We add relevant data:
-data['len']  = np.array(show_len(tweets2))
-# data['ID']   = np.array([tweet.id for tweet in tweets])
-data['Date'] = np.array(show_date(tweets3))
-# data['Source'] = np.array([tweet.source for tweet in tweets])
-# data['Likes']  = np.array([tweet.favorite_count for tweet in tweets])
-# data['RTs']    = np.array([tweet.retweet_count for tweet in tweets])
+# # We extract the mean of lenghts:
+# mean = np.mean(data['len'])
 
-# Display of first 10 elements from dataframe:
-display(data.head(10))
-
-# We extract the mean of lenghts:
-mean = np.mean(data['len'])
-
-print("The lenght's average in tweets: {}".format(mean))
+# print("The lenght's average in tweets: {}".format(mean))
 
 # print(arsenal_tweet_date)
 
