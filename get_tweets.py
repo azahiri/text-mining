@@ -34,7 +34,7 @@ def twitter_setup():
     return api
 
 def get_tweets_by_username(screen_name):
-    # We create an extractor object:
+    """We create an extractor object:"""
     extractor = twitter_setup()
     tweets = tweepy.Cursor(extractor.user_timeline, screen_name=screen_name)
 
@@ -46,3 +46,10 @@ tweet_list = list(tweets.items())
 
 with open(f'tweets_by_{SCREEN_NAME}.p', 'wb') as f:
     pickle.dump(tweet_list, f)
+
+# tweets = get_tweets_by_username(screen_name=SCREEN_NAME)
+
+# # print(len(list(tweets.items())))
+# tweet_list = list(tweets.items())
+# with open(f'tweets_by_{SCREEN_NAME}.p', 'wb') as f:
+#     pickle.dump(tweet_list, f)
