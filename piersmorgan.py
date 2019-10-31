@@ -43,7 +43,7 @@ def get_tweets_by_username(screen_name):
 
     return tweets
 
-# tweets = get_tweets_by_username(screen_name=SCREEN_NAME)
+tweets = get_tweets_by_username(screen_name=SCREEN_NAME)
 
 # # print(len(list(tweets.items())))
 # tweet_list = list(tweets.items())
