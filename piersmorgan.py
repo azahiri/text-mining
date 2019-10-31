@@ -188,7 +188,7 @@ def main():
     # We extract the mean of lenghts:
     mean = np.mean(data['len'])
 
-    print("Average length of tweet: {} characters\n".format(int(mean)))
+    print("Average length of tweet: {0:.2f} characters\n".format(float(mean)))
 
     # We extract the tweet with more FAVs and more RTs:
     fav_max = np.max(data['Likes'])
@@ -222,21 +222,21 @@ def main():
     neg_tweets = [ tweet for index, tweet in enumerate(data['Tweets']) if data['SA'][index] < 0]
 
     # We print percentages:
-    print("\nPercentage of positive tweets: {}%".format(int(len(pos_tweets)*100/len(data['Tweets']))))
-    print("Percentage of neutral tweets: {}%".format(int(len(neu_tweets)*100/len(data['Tweets']))))
-    print("Percentage of negative tweets: {}%\n".format(int(len(neg_tweets)*100/len(data['Tweets']))))
+    print("\nPercentage of positive tweets: {0:.2f}%".format(float(len(pos_tweets)*100/len(data['Tweets']))))
+    print("Percentage of neutral tweets: {0:.2f}%".format(float(len(neu_tweets)*100/len(data['Tweets']))))
+    print("Percentage of negative tweets: {0:.2f}%\n".format(float(len(neg_tweets)*100/len(data['Tweets']))))
 
     # We create time series for data:
     tlen = pd.Series(data=data['len'].values, index=data['Date'])
     tfav = pd.Series(data=data['Likes'].values, index=data['Date'])
     tret = pd.Series(data=data['RTs'].values, index=data['Date'])
 
-    # Tweet lenghts visualization:
+    # Tweet Lenght Visualization:
     tlen.plot(figsize=(16,4), color='r')
     print("Length of tweets over time:")
     plt.show()
 
-    # Likes vs retweets visualization:
+    # Likes vs Retweets Visualization:
     tfav.plot(figsize=(16,4), label="Likes", legend=True)
     tret.plot(figsize=(16,4), label="Retweets", legend=True)
     print("Likes vs Retweets on tweets over time:")
