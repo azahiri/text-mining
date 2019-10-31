@@ -2,16 +2,25 @@
 import tweepy           # To consume Twitter's API
 import pandas as pd     # To handle data
 import numpy as np      # For number computing
+import pickle           # For pickling data
 
 # For plotting and visualization:
 from IPython.display import display
 import matplotlib.pyplot as plt
 import seaborn as sns
 'exec(%matplotlib inline)'
-# %matplotlib inline
+import time
+import datetime
+
+# For sentiment analysis:
+from textblob import TextBlob
+import re
 
 # We import our access keys:
 from credentials import *    # This will allow us to use the keys as variables
+
+KEYWORDS = ['Arsenal', 'Emery', 'Xhaka', 'Ozil']
+SCREEN_NAME = "piersmorgan"
 
 # API's setup:
 def twitter_setup():
@@ -27,56 +36,108 @@ def twitter_setup():
     api = tweepy.API(auth)
     return api
 
-# We create an extractor object:
-extractor = twitter_setup()
+def get_tweets_by_username(screen_name):
+    """ We create an extractor object:"""
+    extractor = twitter_setup()
+    tweets = tweepy.Cursor(extractor.user_timeline, screen_name=screen_name)
 
-# We create a tweet list as follows:
-tweets = extractor.user_timeline(screen_name="piersmorgan", count=200)
-print("Number of tweets extracted: {}.\n".format(len(tweets)))
+    return tweets
 
-# We print the most recent 5 tweets:
-print("5 recent tweets:\n")
-for tweet in tweets[:5]:
-    print(tweet.text)
-    print()
+# tweets = get_tweets_by_username(screen_name=SCREEN_NAME)
+
+# # print(len(list(tweets.items())))
+# tweet_list = list(tweets.items())
+# with open(f'tweets_by_{SCREEN_NAME}.p', 'wb') as f:
+#     pickle.dump(tweet_list, f)
+
+
+with open(f'tweets_by_{SCREEN_NAME}.p', 'rb') as f:
+    tweet_list = pickle.load(f)
+
+def process_tweets(tweets, keywords):
+    """
+    Given a list of tweets, a list of keywords,
+    return a list of tweets that only contain the keywords
+    """
+    useful_tweets = []
+    for tweet in tweets:
+        for keyword in keywords:
+            if keyword in tweet.text:
+                useful_tweets.append(tweet)
+                break
+    return useful_tweets
+
+useful_tweets = process_tweets(tweet_list, KEYWORDS)
+
+def show_text(tweets):
+    arsenal_tweet_text = []
+    for tweet in tweets:
+        arsenal_tweet_text.append(tweet.text)
+    return arsenal_tweet_text
+
+def show_len(tweets):
+    arsenal_tweet_len = []
+    for tweet in tweets:
+        arsenal_tweet_len.append(len(tweet.text))
+    return arsenal_tweet_len
+
+def show_date(tweets):
+    arsenal_tweet_date = []
+    for tweet in tweets:
+        arsenal_tweet_date.append(tweet.created_at.strftime('%m/%d/%Y'))
+    return arsenal_tweet_date
+
+def show_ID(tweets):
+    arsenal_tweet_text = []
+    for tweet in tweets:
+        arsenal_tweet_text.append(tweet.id)
+    return arsenal_tweet_text
+
+def show_source(tweets):
+    arsenal_tweet_text = []
+    for tweet in tweets:
+        arsenal_tweet_text.append(tweet.source)
+    return arsenal_tweet_text
+
+def show_likes(tweets):
+    arsenal_tweet_text = []
+    for tweet in tweets:
+        arsenal_tweet_text.append(tweet.favorite_count)
+    return arsenal_tweet_text
+
+def show_RT(tweets):
+    arsenal_tweet_text = []
+    for tweet in tweets:
+        arsenal_tweet_text.append(tweet.retweet_count)
+    return arsenal_tweet_text
+
+useful_tweets_text = show_text(useful_tweets)
+useful_tweets_len = show_len(useful_tweets)
+useful_tweets_date = show_date(useful_tweets)
+useful_tweets_ID = show_ID(useful_tweets)
+useful_tweets_source = show_source(useful_tweets)
+useful_tweets_likes = show_likes(useful_tweets)
+useful_tweets_RT = show_RT(useful_tweets)
+
+print("Total number of tweets about Arsenal: {} tweets\n".format(len(useful_tweets)))
 
 # We create a pandas dataframe as follows:
-data = pd.DataFrame(data=[tweet.text for tweet in tweets], columns=['Tweets'])
-
-# We display the first 10 elements of the dataframe:
-display(data.head(10))
-
-# Internal methods of a single tweet object:
-print(dir(tweets[0]))
-
-# We print info from the first tweet:
-print(tweets[0].id)
-print(tweets[0].created_at)
-print(tweets[0].source)
-print(tweets[0].favorite_count)
-print(tweets[0].retweet_count)
-print(tweets[0].geo)
-print(tweets[0].coordinates)
-print(tweets[0].entities)
+data = pd.DataFrame(data=useful_tweets_text, columns=['Tweets'])
 
 # We add relevant data:
-data['len']  = np.array([len(tweet.text) for tweet in tweets])
-data['ID']   = np.array([tweet.id for tweet in tweets])
-data['Date'] = np.array([tweet.created_at for tweet in tweets])
-data['Source'] = np.array([tweet.source for tweet in tweets])
-data['Likes']  = np.array([tweet.favorite_count for tweet in tweets])
-data['RTs']    = np.array([tweet.retweet_count for tweet in tweets])
-
-# Display of first 10 elements from dataframe:
-display(data.head(10))
+data['len']  = np.array(useful_tweets_len)
+data['ID']   = np.array(useful_tweets_ID)
+data['Date'] = np.array(useful_tweets_date)
+data['Source'] = np.array(useful_tweets_source)
+data['Likes']  = np.array(useful_tweets_likes)
+data['RTs']    = np.array(useful_tweets_RT)
 
 # We extract the mean of lenghts:
 mean = np.mean(data['len'])
 
-print("The lenght's average in tweets: {}".format(mean))
+print("Average length of tweet: {} characters\n".format(int(mean)))
 
 # We extract the tweet with more FAVs and more RTs:
-
 fav_max = np.max(data['Likes'])
 rt_max  = np.max(data['RTs'])
 
@@ -84,29 +145,14 @@ fav = data[data.Likes == fav_max].index[0]
 rt  = data[data.RTs == rt_max].index[0]
 
 # Max FAVs:
-print("The tweet with more likes is: \n{}".format(data['Tweets'][fav]))
+print("The tweet with the most likes is: \n{}".format(data['Tweets'][fav]))
 print("Number of likes: {}".format(fav_max))
 print("{} characters.\n".format(data['len'][fav]))
 
 # Max RTs:
-print("The tweet with more retweets is: \n{}".format(data['Tweets'][rt]))
+print("The tweet with the most retweets is: \n{}".format(data['Tweets'][rt]))
 print("Number of retweets: {}".format(rt_max))
 print("{} characters.\n".format(data['len'][rt]))
-
-# We create time series for data:
-
-tlen = pd.Series(data=data['len'].values, index=data['Date'])
-tfav = pd.Series(data=data['Likes'].values, index=data['Date'])
-tret = pd.Series(data=data['RTs'].values, index=data['Date'])
-
-# Lenghts along time:
-tlen.plot(figsize=(16,4), color='r')
-plt.show()
-
-# Likes vs retweets visualization:
-tfav.plot(figsize=(16,4), label="Likes", legend=True)
-tret.plot(figsize=(16,4), label="Retweets", legend=True)
-plt.show()
 
 # We obtain all possible sources:
 sources = []
@@ -118,25 +164,6 @@ for source in data['Source']:
 print("Creation of content sources:")
 for source in sources:
     print("* {}".format(source))
-
-# We create a numpy vector mapped to labels:
-percent = np.zeros(len(sources))
-
-for source in data['Source']:
-    for index in range(len(sources)):
-        if source == sources[index]:
-            percent[index] += 1
-            pass
-
-percent /= 100
-
-# Pie chart:
-pie_chart = pd.Series(percent, index=sources, name='Sources')
-pie_chart.plot.pie(fontsize=11, autopct='%.2f', figsize=(6, 6))
-plt.show()
-
-from textblob import TextBlob
-import re
 
 def clean_tweet(tweet):
     '''
@@ -162,6 +189,7 @@ def analize_sentiment(tweet):
 data['SA'] = np.array([ analize_sentiment(tweet) for tweet in data['Tweets'] ])
 
 # We display the updated dataframe with the new column:
+print("\nLast 10 Tweets:")
 display(data.head(10))
 
 # We construct lists with classified tweets:
@@ -170,6 +198,24 @@ neu_tweets = [ tweet for index, tweet in enumerate(data['Tweets']) if data['SA']
 neg_tweets = [ tweet for index, tweet in enumerate(data['Tweets']) if data['SA'][index] < 0]
 
 # We print percentages:
-print("Percentage of positive tweets: {}%".format(len(pos_tweets)*100/len(data['Tweets'])))
-print("Percentage of neutral tweets: {}%".format(len(neu_tweets)*100/len(data['Tweets'])))
-print("Percentage of negative tweets: {}%".format(len(neg_tweets)*100/len(data['Tweets'])))
+print("\nPercentage of positive tweets: {}%".format(int(len(pos_tweets)*100/len(data['Tweets']))))
+print("Percentage of neutral tweets: {}%".format(int(len(neu_tweets)*100/len(data['Tweets']))))
+print("Percentage of negative tweets: {}%\n".format(int(len(neg_tweets)*100/len(data['Tweets']))))
+
+# We create time series for data:
+tlen = pd.Series(data=data['len'].values, index=data['Date'])
+tfav = pd.Series(data=data['Likes'].values, index=data['Date'])
+tret = pd.Series(data=data['RTs'].values, index=data['Date'])
+
+# Lenghts along time:
+tlen.plot(figsize=(16,4), color='r')
+print("Length of tweets over time:")
+plt.show()
+
+# Likes vs retweets visualization:
+tfav.plot(figsize=(16,4), label="Likes", legend=True)
+tret.plot(figsize=(16,4), label="Retweets", legend=True)
+print("Likes vs Retweets on tweets over time:")
+plt.show()
+
+print("Hope you enjoyed those visuals!")
